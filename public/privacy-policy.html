@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - JumpJump</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .hidden { display: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+    <h2 id="title">Privacy Policy</h2>
+    <label for="language">Select Language:</label>
+    <select id="language">
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+    </select>
+    
+    <div id="content">
+        <div class="lang" id="zh" class="hidden">
+            <h3>1. 應用程式名稱與開發者</h3>
+            <p>應用程式名稱：JumpJump<br>開發者：GamePrimitive</p>
+            <h3>2. 我們收集的數據</h3>
+            <table>
+                <tr><th>數據類型</th><th>用途</th></tr>
+                <tr><td>玩家名稱</td><td>辨識玩家身份</td></tr>
+                <tr><td>金錢、道具、分數</td><td>儲存遊戲進度</td></tr>
+            </table>
+            <h3>3. 數據存儲與安全</h3>
+            <p>您的數據儲存於雲端資料庫，主要包括玩家基本資訊。我們會盡可能保護您的數據安全。</p>
+            <h3>4. 用戶數據管理</h3>
+            <p>用戶無法手動刪除數據，但可以透過停用帳號來請求刪除。</p>
+            <h3>5. 兒童隱私</h3>
+            <p>我們允許 13 歲以上的玩家使用本應用程式，但支付功能僅限 18 歲以上的用戶。</p>
+            <h3>6. 聯絡我們</h3>
+            <p>如果您有任何問題，請透過 <a href="https://www.facebook.com/profile.php?id=100063880394323">Facebook</a> 與我們聯繫。</p>
+        </div>
+        
+        <div class="lang" id="en">
+            <h3>1. App Name & Developer</h3>
+            <p>App Name: JumpJump<br>Developer: GamePrimitive</p>
+            <h3>2. Data We Collect</h3>
+            <table>
+                <tr><th>Data Type</th><th>Purpose</th></tr>
+                <tr><td>Player Name</td><td>Identify player</td></tr>
+                <tr><td>Money, Items, Score</td><td>Store game progress</td></tr>
+            </table>
+            <h3>3. Data Storage & Security</h3>
+            <p>Your data is stored in a cloud database, including basic player information. We strive to protect your data security.</p>
+            <h3>4. User Data Management</h3>
+            <p>Users cannot manually delete data, but they can request deletion by deactivating their account.</p>
+            <h3>5. Children's Privacy</h3>
+            <p>Our app allows players aged 13 and above, but payment features are only available for users aged 18 and above.</p>
+            <h3>6. Contact Us</h3>
+            <p>If you have any questions, please contact us via <a href="https://www.facebook.com/profile.php?id=100063880394323">Facebook</a>.</p>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let selectedLang = document.getElementById('language').value = 'en';
+            document.querySelectorAll('.lang').forEach(lang => lang.classList.add('hidden'));
+            document.getElementById(selectedLang).classList.remove('hidden');
+        });
+        
+        document.getElementById('language').addEventListener('change', function() {
+            let selectedLang = this.value;
+            document.querySelectorAll('.lang').forEach(lang => lang.classList.add('hidden'));
+            document.getElementById(selectedLang).classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
