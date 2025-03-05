@@ -70,7 +70,7 @@ function handleIncompletePayment(payment) {
 
     console.log("🔄 重新尝试完成支付:", payment_id, txid);
 
-    fetch("https://pinwebapp.netlify.app//.netlify/functions/completepayment", {
+    fetch("https://jumpjumptest.netlify.app//.netlify/functions/completepayment", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -131,7 +131,7 @@ function cancelPayment(payment) {
         const paymentCallbacks = {
             onReadyForServerApproval: async (paymentId) => {
                 console.log("支付等待批准:", paymentId);
-                const response = await fetch("https://pinwebapp.netlify.app//.netlify/functions/approvePayment", {
+                const response = await fetch("https://jumpjumptest.netlify.app//.netlify/functions/approvePayment", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ paymentId, uid: currentUser.uid }) // 传递 uid
@@ -147,7 +147,7 @@ function cancelPayment(payment) {
                 console.log("支付完成，通知后端:", paymentId, txid);
 
     try {
-        const response = await fetch("https://pinwebapp.netlify.app//.netlify/functions/completepayment", {
+        const response = await fetch("https://jumpjumptest.netlify.app//.netlify/functions/completepayment", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ payment_id: paymentId, txid: txid })
