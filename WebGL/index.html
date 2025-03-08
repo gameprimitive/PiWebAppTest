@@ -1,5 +1,32 @@
 <!DOCTYPE html>
 <html lang="en-us">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: black; /* 避免多餘的白邊 */
+  }
+
+  #unity-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vmin; /* 設定最大寬度 */
+    height: 177.78vmin; /* 9:16 比例 (100 / 9 * 16 = 177.78) */
+    max-width: 56.25vh; /* 設定最大高度 */
+    max-height: 100vh;
+    transform: translate(-50%, -50%);
+  }
+
+  #unity-canvas {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
