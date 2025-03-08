@@ -7,6 +7,14 @@ const contentToCache = [
     "TemplateData/style.css"
 
 ];
+self.addEventListener('activate', function (e) {
+    e.waitUntil((async function () {
+        const clientsList = await clients.matchAll();
+        clientsList.forEach(client => {
+            client.postMessage({ action: "applyAspectRatioFix" });
+        });
+    })());
+});
 
 self.addEventListener('install', function (e) {
     console.log('[Service Worker] Install');
