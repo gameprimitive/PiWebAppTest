@@ -1,191 +1,124 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en-us">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pi 简易支付测试</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | JumpJump</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+	<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+</head>
+  <body>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width=720 height=1280 tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+      <div id="unity-warning"> </div>
+      <div id="unity-footer">
+        <div id="unity-webgl-logo"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">JumpJump</div>
+      </div>
+    </div>
     <script>
-        // 初始化 SDK
-        Pi.init({ 
-            version: "2.0",
-            sandbox: true // ✅ 必须启用沙盒模式
-			
-        });
 
-        let currentUser = null; // 定义 currentUser 变量
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+      var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+      var warningBanner = document.querySelector("#unity-warning");
 
-        // 处理未完成的支付
-        function onIncompletePaymentFound(payment) {
-            console.log("⚠️ 发现未完成的支付:", payment);
-            // 在此处理未完成的支付，例如向服务器请求支付状态
-            handleIncompletePayment(payment);
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
+      function unityShowBanner(msg, type) {
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
         }
-
-        // 登录功能
-        async function login() {
-            try {
-                // 1️⃣ 进行 Pi Network 身份验证
-                const authResult = await Pi.authenticate(['username', 'wallet_address', 'payments'], onIncompletePaymentFound);
-                console.log("✅ 登录成功", authResult);
-                currentUser = authResult.user; // 将用户信息存储在 currentUser 变量中
-                // 处理登录后的逻辑
-                alert("登录成功！");
-            } catch (error) {
-                console.error("❌ 登录失败:", error);
-                alert("登录失败：" + error.message);
-            }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
         }
-
-
-
-
-async function onIncompletePaymentFound(payment) {
-  console.log('⚠️ 发现未完成的支付:', payment);
-  
-  // 提示用户选择继续或取消支付
-  const userChoice = confirm(`您有一笔未完成的支付：${payment.memo}，金额：${payment.amount} Pi。是否继续完成支付？`);
-
-  if (userChoice) {
-    // 用户选择继续支付
-    handleIncompletePayment(payment);
-  } else {
-    // 用户选择取消支付
-    cancelPayment(payment);
-  }
-}
-function handleIncompletePayment(payment) {
-    if (!payment || !payment.identifier || !payment.transaction) {
-        console.error("❌ 支付信息缺失:", payment);
-        return;
-    }
-
-    const payment_id = payment.identifier; // 提取支付 ID
-    const txid = payment.transaction.txid; // 提取交易 ID（如果有）
-    
-    if (!txid) {
-        console.warn("⚠️ 交易 ID 缺失，可能未上链:", payment);
-        return;
-    }
-
-    console.log("🔄 重新尝试完成支付:", payment_id, txid);
-
-    fetch("https://jumpjumptest.netlify.app//.netlify/functions/completepayment", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            payment_id: payment_id,
-            txid: txid
-        })
-    })
-    .then(response => response.json())
-    .then(result => {
-        console.log("✅ 支付完成结果:", result);
-    })
-    .catch(error => {
-        console.error("❌ 支付请求失败:", error);
-    });
-}
-
-function cancelPayment(payment) {
-  fetch('/server/cancel_payment', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ paymentId: payment.identifier }),
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      console.log('✅ 支付已取消');
-      
-      // 这里手动触发 onCancel
-      if (typeof paymentCallbacks.onCancel === "function") {
-        paymentCallbacks.onCancel(payment.identifier);
+        updateBannerVisibility();
       }
-      
-    } else {
-      console.error('❌ 支付取消失败:', data.error);
-    }
-  })
-  .catch(error => {
-    console.error('❌ 支付取消处理失败:', error);
-  });
-}
 
-        // 支付功能
-       async function pay() {
-    if (!currentUser) return alert("请先登录！");
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/WebGL.loader.js";
+      var config = {
+        dataUrl: buildUrl + "/WebGL.data",
+        frameworkUrl: buildUrl + "/WebGL.framework.js",
+        codeUrl: buildUrl + "/WebGL.wasm",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "GamePrimitive",
+        productName: "JumpJump",
+        productVersion: "1.0",
+        showBanner: unityShowBanner,
+      };
 
-    try {
-        const paymentData = {
-            amount: 3.14,
-            memo: "测试支付",
-            metadata: { test: "123" },
-            uid: currentUser.uid
-        };
+      // By default Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
 
-        const paymentCallbacks = {
-            onReadyForServerApproval: async (paymentId) => {
-                console.log("支付等待批准:", paymentId);
-                const response = await fetch("https://jumpjumptest.netlify.app//.netlify/functions/approvePayment", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ paymentId, uid: currentUser.uid }) // 传递 uid
-                });
-                const result = await response.json();
-                if (result.success) {
-                    console.log("支付已批准，交易ID:", result.txid);
-                } else {
-                    console.error("支付批准失败:", result.error);
-                }
-            },
-            onReadyForServerCompletion: async (paymentId, txid) => {
-                console.log("支付完成，通知后端:", paymentId, txid);
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
 
-    try {
-        const response = await fetch("https://jumpjumptest.netlify.app//.netlify/functions/completepayment", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ payment_id: paymentId, txid: txid })
-        });
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        container.className = "unity-mobile";
+        canvas.className = "unity-mobile";
 
-        if (!response.ok) throw new Error(`HTTP 错误! 状态码: ${response.status}`);
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
+        // config.devicePixelRatio = 1;
 
-        const result = await response.json();
-        console.log("✅ 支付完成结果:", result);
-    } catch (error) {
-        console.error("❌ 支付请求失败:", error);
-    }
-            },
-            onCancel: (paymentId) => {
-                alert("用户取消支付");
-            },
-            onError: (error) => {
-                console.error("支付错误:", error);
-                alert("支付错误: " + (error.response ? JSON.stringify(error.response.data) : error.message));
-            }
-        };
 
-        const payment = await Pi.createPayment(paymentData, paymentCallbacks);
-        console.log("支付已发起:", payment);
-    } catch (error) {
-        alert("支付失败: " + error.message);
-    }
-}
+      } else {
+        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
+
+        canvas.style.width = "720px";
+        canvas.style.height = "1280px";
+      }
+
+      loadingBar.style.display = "block";
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          progressBarFull.style.width = 100 * progress + "%";
+        }).then((unityInstance) => {
+            window.unityInstance = unityInstance;
+                  loadingBar.style.display = "none";                  
+                fullscreenButton.onclick = () => {
+                  unityInstance.SetFullscreen(1);
+                };
+              }).catch((message) => {
+                alert(message);
+              });
+            };
+
+      document.body.appendChild(script);
 
     </script>
-</head>
-<body>
-    <h1>Pi 支付测试 </h1>
-    
-    <button onclick="login()">1. 登录 Pi 账号</button>
-    <button onclick="pay()" style="margin-top:20px">2. 发起支付</button>
-    
-    <h2>用户信息：</h2>
-    <pre id="user-info">尚未登录</pre>
-</body>
+  </body>
 </html>
