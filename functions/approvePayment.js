@@ -33,9 +33,8 @@ exports.handler = async function(event, context) {
             }
         });
 
-        console.log("✅ Pi 服务器返回数据:", response.data);
 
-         if (response.data && response.data.txid) {
+         if (response.data) {
             // 支付已成功批准
             return {
                 statusCode: 200,
